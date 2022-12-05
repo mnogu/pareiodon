@@ -106,11 +106,6 @@ impl Protocol for IPv4 {
         let header = &mut buf[..ihl].to_vec();
         self._verify_header_checksum(header)?;
 
-        // Swap the source IP address for the destination IP address
-        for i in 12..16 {
-            header.swap(i, i + 4);
-        }
-
         let protocol = buf[9];
         let data = &buf[ihl..];
         for p in &self.protocols {
@@ -119,6 +114,10 @@ impl Protocol for IPv4 {
             }
 
             if let Ok(mut data) = p.reply(data) {
+                // Swap the source IP address for the destination IP address
+                for i in 12..16 {
+                    header.swap(i, i + 4);
+                }
                 let mut buf = header.to_vec();
                 buf.append(&mut data);
                 return Ok(buf);
