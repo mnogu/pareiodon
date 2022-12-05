@@ -11,13 +11,17 @@ impl fmt::Display for IPv4Error {
     }
 }
 
+pub trait IPv4Protocol: Protocol {
+    fn number(&self) -> u8;
+}
+
 // RFC 791
 pub struct IPv4 {
-    protocols: Vec<Box<dyn Protocol>>,
+    protocols: Vec<Box<dyn IPv4Protocol>>,
 }
 
 impl IPv4 {
-    pub fn new(protocols: Vec<Box<dyn Protocol>>) -> IPv4 {
+    pub fn new(protocols: Vec<Box<dyn IPv4Protocol>>) -> IPv4 {
         IPv4 { protocols }
     }
 }
@@ -107,8 +111,13 @@ impl Protocol for IPv4 {
             header.swap(i, i + 4);
         }
 
+        let protocol = buf[9];
         let data = &buf[ihl..];
         for p in &self.protocols {
+            if protocol != p.number() {
+                continue;
+            }
+
             if let Ok(mut data) = p.reply(data) {
                 let mut buf = header.to_vec();
                 buf.append(&mut data);

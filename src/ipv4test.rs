@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::{
-        ipv4::{IPv4, IPv4Error},
+        ipv4::{IPv4, IPv4Error, IPv4Protocol},
         protocol::{Protocol, ProtocolError},
     };
 
@@ -10,6 +10,14 @@ mod tests {
     impl Protocol for TestProtocol {
         fn reply(&self, buf: &[u8]) -> Result<Vec<u8>, ProtocolError> {
             Ok(buf.to_vec())
+        }
+    }
+
+    impl IPv4Protocol for TestProtocol {
+        fn number(&self) -> u8 {
+            // RFC 3692
+            // 0xfd
+            253
         }
     }
 
@@ -22,8 +30,8 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
-            0x49, 0x36, // Header Checksum
+            0xfd, // Protocol
+            0x48, 0x3a, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x02, // Destination Address
             0x08, 0x00, 0x7f, 0x57, 0x00, 0x2d, 0x00, 0x02, 0xf3, 0x89, 0x8d, 0x63, 0x00, 0x00,
@@ -43,8 +51,8 @@ mod tests {
                 0x6d, 0x6f, // Identification
                 0x40, 0x00, // Flags, Fragment Offset
                 0x40, // Time to Live
-                0x01, // Protocol
-                0x49, 0x36, // Header Checksum
+                0xfd, // Protocol
+                0x48, 0x3a, // Header Checksum
                 0xc0, 0x00, 0x02, 0x02, // Source Address
                 0xc0, 0x00, 0x02, 0x01, // Destination Address
                 0x08, 0x00, 0x7f, 0x57, 0x00, 0x2d, 0x00, 0x02, 0xf3, 0x89, 0x8d, 0x63, 0x00, 0x00,
@@ -65,7 +73,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, // Destination Address (missing 1 byte)
@@ -84,7 +92,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x01, // Destination Address
@@ -106,7 +114,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x01, // Destination Address
@@ -128,7 +136,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x02, // Destination Address
@@ -155,7 +163,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x20, 0x00, // Flags (More Fragments), Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x01, // Destination Address
@@ -177,7 +185,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x41, 0x00, // Flags, Fragment Offset (non zero)
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x01, // Destination Address
@@ -196,7 +204,7 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x01, // Flags, Fragment Offset (non zero)
             0x40, // Time to Live
-            0x01, // Protocol
+            0xfd, // Protocol
             0x49, 0x36, // Header Checksum
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x01, // Destination Address
@@ -218,8 +226,8 @@ mod tests {
             0x6d, 0x6f, // Identification
             0x40, 0x00, // Flags, Fragment Offset
             0x40, // Time to Live
-            0x01, // Protocol
-            0x49, 0x75, // Header Checksum (wrong header checksum)
+            0xfd, // Protocol
+            0x48, 0x79, // Header Checksum (wrong header checksum)
             0xc0, 0x00, 0x02, 0x01, // Source Address
             0xc0, 0x00, 0x02, 0x02, // Destination Address
         ];

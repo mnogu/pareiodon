@@ -1,5 +1,9 @@
-use crate::protocol::{get_checksum, Protocol, ProtocolError};
+use crate::{
+    ipv4::IPv4Protocol,
+    protocol::{get_checksum, Protocol, ProtocolError},
+};
 
+// RFC 792
 pub struct Icmp {}
 
 impl Icmp {
@@ -26,5 +30,11 @@ impl Protocol for Icmp {
         buf[2] = (checksum >> 8) as u8;
         buf[3] = (checksum & 0xff) as u8;
         Ok(buf)
+    }
+}
+
+impl IPv4Protocol for Icmp {
+    fn number(&self) -> u8 {
+        1
     }
 }
