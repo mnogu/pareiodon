@@ -4,6 +4,7 @@ use crate::{icmp::Icmp, protocol::Protocol, tun::Tun};
 
 mod icmp;
 mod ipv4;
+mod ipv4test;
 mod protocol;
 mod tun;
 
@@ -20,7 +21,7 @@ fn main() {
         // Debug
         println!("{:x?}", buf);
 
-        if let Some(mut buf) = ipv4.reply(buf) {
+        if let Ok(mut buf) = ipv4.reply(buf) {
             tun.write(&mut buf).unwrap();
         }
     }

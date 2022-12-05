@@ -1,4 +1,4 @@
-use crate::protocol::Protocol;
+use crate::protocol::{get_checksum, Protocol, ProtocolError};
 
 pub struct Icmp {}
 
@@ -9,7 +9,7 @@ impl Icmp {
 }
 
 impl Protocol for Icmp {
-    fn reply(&self, buf: &[u8]) -> Option<Vec<u8>> {
+    fn reply(&self, buf: &[u8]) -> Result<Vec<u8>, ProtocolError> {
         let mut buf = buf.to_vec();
 
         // Type
@@ -20,19 +20,11 @@ impl Protocol for Icmp {
         buf[2] = 0;
         buf[3] = 0;
 
-        let mut checksum: u32 = 0;
-        for i in (0..buf.len()).step_by(2) {
-            checksum += ((buf[i] as u32) << 8) + buf[i + 1] as u32;
-        }
-        while (checksum >> 16) != 0 {
-            checksum = (checksum & 0xffff) + (checksum >> 16);
-        }
-        // one's complement
-        checksum = !checksum;
+        let checksum = get_checksum(&buf);
 
         // Checksum
         buf[2] = (checksum >> 8) as u8;
         buf[3] = (checksum & 0xff) as u8;
-        Some(buf)
+        Ok(buf)
     }
 }
