@@ -1,4 +1,4 @@
-use crate::ipv4::IPv4Error;
+use crate::{icmp::IcmpError, ipv4::IPv4Error};
 
 pub trait Protocol {
     fn reply(&self, buf: &[u8]) -> Result<Vec<u8>, ProtocolError>;
@@ -7,12 +7,19 @@ pub trait Protocol {
 #[derive(Debug, Eq, PartialEq)]
 pub enum ProtocolError {
     IPv4(IPv4Error),
+    Icmp(IcmpError),
     General,
 }
 
 impl From<IPv4Error> for ProtocolError {
     fn from(e: IPv4Error) -> Self {
         Self::IPv4(e)
+    }
+}
+
+impl From<IcmpError> for ProtocolError {
+    fn from(e: IcmpError) -> Self {
+        Self::Icmp(e)
     }
 }
 

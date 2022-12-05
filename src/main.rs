@@ -4,6 +4,7 @@ use tuntap::{TunTap, TunTapFlag};
 use crate::{icmp::Icmp, protocol::Protocol};
 
 mod icmp;
+mod icmptest;
 mod ipv4;
 mod ipv4test;
 mod protocol;
