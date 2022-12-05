@@ -1,15 +1,16 @@
 use ipv4::IPv4;
+use tuntap::{TunTap, TunTapFlag};
 
-use crate::{icmp::Icmp, protocol::Protocol, tun::Tun};
+use crate::{icmp::Icmp, protocol::Protocol};
 
 mod icmp;
 mod ipv4;
 mod ipv4test;
 mod protocol;
-mod tun;
+mod tuntap;
 
 fn main() {
-    let tun = Tun::new().unwrap();
+    let tun = TunTap::new(TunTapFlag::Tun).unwrap();
     let icmp = Box::new(Icmp::new());
     let ipv4 = IPv4::new(vec![icmp]);
 
